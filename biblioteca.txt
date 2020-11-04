@@ -1,0 +1,3 @@
+Biblilhotecas utilizadas:
+
+pyqt5
