@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from Design.MainWindow import Ui_MainWindow
 from funcoes.poupUp import Error
+from funcoes.criptografia import gerar_chaves, cifrar_mensagem, descriptar_mensagem
 import sys
 
 
@@ -31,6 +32,7 @@ class Main(QMainWindow, Ui_MainWindow):
 
         #  Janela - Descriptografar
         self.btn_descriptografar_editChave.clicked.connect(lambda: self.editar_chave_temporaria())
+        self.btn_descriptografar_descriptar.clicked.connect(lambda: self.descriptografar_mensagem())
 
         #  Janela - Criptografar]
         self.btn_criptografar_encriptar.clicked.connect(lambda: self.criptografar_mensagem())
@@ -43,12 +45,13 @@ class Main(QMainWindow, Ui_MainWindow):
         self.ln_chaveSistema_chavePublica.setText(self.chavePublica)
 
     def criar_nova_chave(self):  # Gera novas chaves RSA
-        chave_privada = "999999999999999"
-        chave_publica = "888888888888888"
+        chaves = gerar_chaves()
+        chave_privada = chaves[1]
+        chave_publica = chaves[0]
         self.ln_nChave_chavePrivada.setEnabled(True)
         self.ln_nchave_chavePublica.setEnabled(True)
-        self.ln_nChave_chavePrivada.setText(chave_privada)
-        self.ln_nchave_chavePublica.setText(chave_publica)
+        self.ln_nChave_chavePrivada.setText(str(chave_privada))
+        self.ln_nchave_chavePublica.setText(str(chave_publica))
 
     def inserir_chave_sistema(self):  # Define a nova chave como padrão do sistema
         self.chavePrivada = self.ln_nChave_chavePrivada.text()
@@ -109,24 +112,63 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def criptografar_mensagem(self):
         try:
-            #  chave_publica = int(self.ln_criptografar_chavePublica.text())
-            #  mensagem = self.txed_criptografar_texto.toPlainText()
-            mensagem_criptografada = "MENSAGEM CRIPTOGRAFADA"
-            self.txed_criptografar_texto.setText(mensagem_criptografada)
+            chave_publica = self.limpar_chaves(self.ln_criptografar_chavePublica.text())
+            mensagem = self.txed_criptografar_texto.toPlainText()
+            mensagem_criptografada = cifrar_mensagem(mensagem, chave_publica[1], chave_publica[0])
+            self.txed_criptografar_texto.setText(self.gerar_string(mensagem_criptografada))
+
         except ValueError:
             self.msg.definir_texto("Informe uma Chave")
             self.msg.show()
 
     def descriptografar_mensagem(self):
-        try:
-            #  chave_publica = int(self.ln_descriptografar_chavePublica.text())
-            #  chave_privada = int(self.ln_descriptografar_chavePrivada.text())
-            #  mensagem = self.txed_criptografar_texto.toPlainText()
-            mensagem_descriptografada = "MENSAGEM DESCRIPTOGRAFADA"
-            self.txed_criptografar_texto.setText(mensagem_descriptografada)
-        except ValueError:
+
+        chave_privada = self.limpar_chaves(self.ln_descriptografar_chavePrivada.text())
+        mensagem = self.gerar_lista(self.txed_descriptografar_texto.toPlainText())
+        mensagem_descriptografada = descriptar_mensagem(mensagem, chave_privada[1], chave_privada[0])
+        self.txed_descriptografar_texto.setText(mensagem_descriptografada)
+        """except ValueError:
             self.msg.definir_texto("Informe as Chaves")
-            self.msg.show()
+            self.msg.show()"""
+
+    def limpar_chaves(self, chaves):
+        key_1 = ""
+        key_2 = ""
+        key = chaves.replace("[", "")
+        key = key.replace("]", "")
+        key = key.replace(" ", "")
+
+        for frase in key:
+            if frase == ",":
+                break
+            key_1 += frase
+
+        key = key.replace("{},".format(key_1), "")
+        for frase in key:
+            key_2 += frase
+
+        return int(key_1), int(key_2)
+
+    def gerar_string(self, mensagem):
+        msg = ""
+        for i in mensagem:
+            msg += str(i) + " "
+        return msg
+
+    def gerar_lista(self, mensagem):
+        lista = [""]
+        count = 0
+        for i in mensagem:
+            if i == " ":
+                count += 1
+                lista.append("")
+            else:
+                lista[count] += i
+        del(lista[-1])
+        return lista
+
+
+
 
 
 if __name__ == '__main__':
