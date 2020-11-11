@@ -197,7 +197,7 @@ class Main(QMainWindow, Ui_MainWindow):
                 self.txed_criptografar_texto.setText(strin)
 
     def limpar_txed_criptografia(self):
-        self.statusMsg == False
+        self.statusMsg = False
         self.txed_criptografar_texto.setReadOnly(False)
         self.txed_criptografar_texto.setText("")
 
