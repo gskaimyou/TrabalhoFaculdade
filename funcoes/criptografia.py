@@ -1,6 +1,13 @@
 import random
 
 
+def gerar_numero():  # gera um número primo aleatório
+    while True:
+        numero = random.randint(0, 100)
+        if primo(numero):
+            return numero
+
+
 def primo(n):  # verifica se o número é primo
     if n <= 1:
         return False
@@ -16,13 +23,6 @@ def primo(n):  # verifica se o número é primo
     return True
 
 
-def gerar_numero():  # gera um número primo aleatório
-    while True:
-        numero = random.randint(0, 100)
-        if primo(numero):
-            return numero
-
-
 def totiente(p, q):  # calcula o totiente de n
     x = (p - 1) * (q - 1)
     return x
@@ -36,7 +36,6 @@ def gerar_e(num):
 
 
 def mdc(num1, num2):
-    resto = 1
     while num2 != 0:
         resto = num1 % num2
         num1 = num2
